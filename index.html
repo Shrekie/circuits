@@ -1,0 +1,71 @@
+<script>
+  const CANVAS_WIDTH = 800;
+  const CANVAS_HEIGHT = 800;
+</script>
+
+<body>
+  <div id="appContainer">
+    <div id="tools">
+      <button class="tool-button" id="wire-tool-button">Wire</button>
+      <button class="tool-button" id="transistor-tool-button">
+        Transistor
+      </button>
+    </div>
+    <canvas id="canvas"></canvas>
+  </div>
+</body>
+
+<script>
+  var canvasElement = document.getElementById("canvas");
+  var canvas2DContext = canvasElement.getContext("2d");
+
+  canvasElement.setAttribute("width", CANVAS_WIDTH);
+  canvasElement.setAttribute("height", CANVAS_HEIGHT);
+</script>
+
+<script src="grid.js" type="module"></script>
+
+<script src="matrix.js" type="module"></script>
+
+<script src="material/Wire.js" type="module"></script>
+<script src="material/Transistor.js" type="module"></script>
+
+<script src="toolSelect.js" type="module"></script>
+
+<script src="grid/clickCell.js" type="module"></script>
+
+<script src="render.js" type="module"></script>
+
+<style>
+  body {
+    background-color: #282f45;
+  }
+
+  #canvas {
+    border: 5px solid black;
+    display: block;
+  }
+
+  #tools {
+    display: flex;
+    flex-direction: column;
+    margin-right: 10px;
+    border: 3px solid black;
+    background-color: white;
+  }
+
+  #appContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .tool-button {
+    background-color: white;
+    border: 1px solid black;
+    border-radius: 10px;
+    width: 100px;
+    font-weight: bold;
+    margin: 10px;
+  }
+</style>

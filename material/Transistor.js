@@ -12,7 +12,7 @@ export default class Transistor {
     this.rotation = rotation;
   }
 
-  flipIntake() {
+  flipOnIntake() {
     let cellDirection = matrix.getDirection(this.x, this.y, this.rotation);
 
     if (
@@ -88,7 +88,7 @@ export default class Transistor {
   }
 
   tick() {
-    this.flipIntake();
+    this.flipOnIntake();
 
     this.drawCircle();
     this.drawLine();

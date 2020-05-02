@@ -3,13 +3,15 @@ import Wire from "./material/Wire.js";
 import Transistor from "./material/Transistor.js";
 
 export default (() => {
-  var active = Wire;
+  var tools = [...document.getElementById("tools").children];
+  var toolList = [Wire, Transistor];
+  var active = null;
 
   var rotateTransistor = (transistor, x, y) => {
-    if (transistor.rotation == "top") return new active(x, y, "right");
-    if (transistor.rotation == "right") return new active(x, y, "bottom");
-    if (transistor.rotation == "bottom") return new active(x, y, "left");
-    if (transistor.rotation == "left") return new active(x, y, "top");
+    if (transistor.rotation == "top") return new Transistor(x, y, "right");
+    if (transistor.rotation == "right") return new Transistor(x, y, "bottom");
+    if (transistor.rotation == "bottom") return new Transistor(x, y, "left");
+    if (transistor.rotation == "left") return new Transistor(x, y, "top");
   };
 
   var transistorTwiceSelected = (x, y) => {
@@ -30,20 +32,22 @@ export default (() => {
     if (active) return new active(x, y);
   };
 
-  var wireToolButton = document.getElementById("wire-tool-button");
-  var transistorToolButton = document.getElementById("transistor-tool-button");
-
-  wireToolButton.onclick = (event) => {
-    wireToolButton.style.backgroundColor = "lightgray";
-    transistorToolButton.style.backgroundColor = "white";
-    active = Wire;
+  var selectTool = (tool, index) => {
+    tools.forEach((tool) => (tool.style.backgroundColor = "white"));
+    tool.style.backgroundColor = "lightgray";
+    active = toolList[index];
   };
 
-  transistorToolButton.onclick = (event) => {
-    wireToolButton.style.backgroundColor = "white";
-    transistorToolButton.style.backgroundColor = "lightgray";
-    active = Transistor;
-  };
+  // Register onclick each tool button
+  tools.forEach(
+    (tool, index) =>
+      (tool.onclick = (event) => {
+        selectTool(tool, index);
+      })
+  );
+
+  // Set tool 0 as default
+  selectTool(tools[0], 0);
 
   return { getActive };
 })();

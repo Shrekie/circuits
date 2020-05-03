@@ -18,20 +18,16 @@ export default class Transistor {
     if (cellOnIntake && cellOnIntake.name == "wire" && cellOnIntake.on == true)
       this.on = false;
     else if (cellOnIntake && cellOnIntake.name == "crossover") {
-      let intakeDirection = matrix.getPointingDirection(cellOnIntake, this);
+      var pointingAxis = matrix.getPointingAxis(cellOnIntake, this);
 
-      if (
-        (intakeDirection == "top" || intakeDirection == "bottom") &&
-        cellOnIntake.verticalOn == true
-      )
+      if (pointingAxis.vertical && cellOnIntake.verticalOn == true)
         this.on = false;
-      if (
-        (intakeDirection == "right" || intakeDirection == "left") &&
-        cellOnIntake.horizontalOn == true
-      )
+
+      if (pointingAxis.horizontal && cellOnIntake.horizontalOn == true)
         this.on = false;
-        
-    } else this.on = true;
+    } else {
+      this.on = true;
+    }
   }
 
   getColor() {

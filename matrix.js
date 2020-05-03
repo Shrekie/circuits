@@ -51,19 +51,30 @@ export default (() => {
     }
   };
 
+  var getPointingAxis = (pointer, target) => {
+    var targetDirection = getPointingDirection(pointer, target);
+    var axis = { vertical: false, horizontal: false };
+
+    if (targetDirection == "top" || targetDirection == "bottom")
+      axis.vertical = true;
+
+    if (targetDirection == "right" || targetDirection == "left")
+      axis.horizontal = true;
+
+    return axis;
+  };
+
   var turnOnWire = (wire, lastWire) => {
     if (wire.name == "wire") {
       wire.on = true;
     }
 
     if (wire.name == "crossover") {
-      var targetDirection = getPointingDirection(wire, lastWire);
+      var pointingAxis = getPointingAxis(wire, lastWire);
 
-      if (targetDirection == "top" || targetDirection == "bottom")
-        wire.verticalOn = true;
+      if (pointingAxis.vertical) wire.verticalOn = pointingAxis.vertical;
 
-      if (targetDirection == "right" || targetDirection == "left")
-        wire.horizontalOn = true;
+      if (pointingAxis.horizontal) wire.verticalOn = pointingAxis.horizontal;
     }
   };
 
@@ -73,57 +84,50 @@ export default (() => {
     }
 
     if (wire.name == "crossover") {
-      var targetDirection = getPointingDirection(wire, lastWire);
+      var pointingAxis = getPointingAxis(wire, lastWire);
 
-      if (targetDirection == "top" || targetDirection == "bottom")
-        return wire.verticalOn;
+      if (pointingAxis.verticalOn) return wire.verticalOn;
 
-      if (targetDirection == "right" || targetDirection == "left")
-        return wire.horizontalOn;
+      if (pointingAxis.horizontal) return wire.horizontalOn;
     }
   };
 
-  var turnOnCluster = (onTransistors) => {
-    var collectConnected = (branch, lastBranch) => {
-      if (branch.name == "transistor") {
-        getTriDegree(branch.x, branch.y, branch.rotation)
-          .filter((wire) => wire.name == "wire" || wire.name == "crossover")
-          .forEach((nextWire) => {
+  var turnOnConnected = (branch, lastBranch) => {
+    if (branch.name == "transistor") {
+      getTriDegree(branch.x, branch.y, branch.rotation)
+        .filter((wire) => wire.name == "wire" || wire.name == "crossover")
+        .forEach((nextWire) => {
+          turnOnWire(nextWire, branch);
+          turnOnConnected(nextWire, branch);
+        });
+    }
+
+    if (branch.name == "wire") {
+      getCross(branch.x, branch.y)
+        .filter(
+          (nextWire) => nextWire.name == "wire" || nextWire.name == "crossover"
+        )
+        .forEach((nextWire) => {
+          if (!wireIsOn(nextWire, branch)) {
             turnOnWire(nextWire, branch);
-            collectConnected(nextWire, branch);
-          });
-      }
-
-      if (branch.name == "wire") {
-        getCross(branch.x, branch.y)
-          .filter(
-            (nextWire) =>
-              nextWire.name == "wire" || nextWire.name == "crossover"
-          )
-          .forEach((nextWire) => {
-            if (!wireIsOn(nextWire, branch)) {
-              turnOnWire(nextWire, branch);
-              collectConnected(nextWire, branch);
-            }
-          });
-      }
-
-      if (branch.name == "crossover") {
-        var cross = getDirection(
-          branch.x,
-          branch.y,
-          getPointingDirection(lastBranch, branch)
-        );
-
-        if (cross && (cross.name == "wire" || cross.name == "crossover"))
-          if (!wireIsOn(cross, branch)) {
-            turnOnWire(cross, branch);
-            collectConnected(cross, branch);
+            turnOnConnected(nextWire, branch);
           }
-      }
-    };
+        });
+    }
 
-    onTransistors.forEach((transistor) => collectConnected(transistor));
+    if (branch.name == "crossover") {
+      var cross = getDirection(
+        branch.x,
+        branch.y,
+        getPointingDirection(lastBranch, branch)
+      );
+
+      if (cross && (cross.name == "wire" || cross.name == "crossover"))
+        if (!wireIsOn(cross, branch)) {
+          turnOnWire(cross, branch);
+          turnOnConnected(cross, branch);
+        }
+    }
   };
 
   return {
@@ -131,6 +135,6 @@ export default (() => {
     getCross,
     getDirection,
     getTriDegree,
-    turnOnCluster,
+    turnOnConnected,
   };
 })();

@@ -16,7 +16,7 @@ export default class Wire {
   }
 
   drawCircle() {
-    material.conductCluster(this);
+    material.conductTransistor(this);
 
     canvas2DContext.fillStyle = this.getColor();
 

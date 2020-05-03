@@ -61,7 +61,7 @@ export default class Crossover {
   }
 
   drawCross() {
-    material.conductCluster(this);
+    material.conductTransistor(this);
 
     this.drawHorizontal();
     this.drawVertical();

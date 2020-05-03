@@ -39,6 +39,7 @@ export default (() => {
   };
 
   canvasElement.oncontextmenu = (event) => {
+    setCellToActiveTool(event);
     return false;
   };
 

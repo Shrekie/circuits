@@ -26,7 +26,7 @@ export default (() => {
   };
 
   var getActive = (x, y, event) => {
-    if (event.which == 3 || event.which == 2) return false;
+    if (event.buttons == 2) return false;
 
     if (
       toolTwiceSelected(grid.cells[x][y], "transistor", Transistor, event.type)

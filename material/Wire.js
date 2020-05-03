@@ -16,8 +16,6 @@ export default class Wire {
   }
 
   drawCircle() {
-    material.conductTransistor(this);
-
     canvas2DContext.fillStyle = this.getColor();
 
     canvas2DContext.beginPath();
@@ -34,6 +32,7 @@ export default class Wire {
   }
 
   tick() {
+    material.conductTransistor(this);
     this.drawCircle();
   }
 }

@@ -132,6 +132,7 @@ export default (() => {
 
   return {
     getPointingDirection,
+    getPointingAxis,
     getCross,
     getDirection,
     getTriDegree,

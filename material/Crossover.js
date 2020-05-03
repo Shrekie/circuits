@@ -61,13 +61,13 @@ export default class Crossover {
   }
 
   drawCross() {
-    material.conductTransistor(this);
-
     this.drawHorizontal();
     this.drawVertical();
   }
 
   tick() {
+    material.conductTransistor(this);
+
     this.drawCross();
   }
 }

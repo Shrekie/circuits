@@ -12,23 +12,6 @@ export default (() => {
     return cross;
   };
 
-  var getTriDegree = (x, y, direction) => {
-    let trifecta = [];
-
-    if (direction != "top") if (y - 1 >= 0) trifecta.push(grid.cells[x][y - 1]);
-
-    if (direction != "right")
-      if (x + 1 <= grid.CELL_COLUMNS - 1) trifecta.push(grid.cells[x + 1][y]);
-
-    if (direction != "bottom")
-      if (y + 1 <= grid.CELL_ROWS - 1) trifecta.push(grid.cells[x][y + 1]);
-
-    if (direction != "left")
-      if (x - 1 >= 0) trifecta.push(grid.cells[x - 1][y]);
-
-    return trifecta;
-  };
-
   var getDirection = (x, y, direction) => {
     if (direction == "top") if (y - 1 >= 0) return grid.cells[x][y - 1];
 
@@ -39,29 +22,115 @@ export default (() => {
       if (y + 1 <= grid.CELL_ROWS - 1) return grid.cells[x][y + 1];
 
     if (direction == "left") if (x - 1 >= 0) return grid.cells[x - 1][y];
-
   };
 
-  var getWireCluster = (startWire) => {
-    var cluster = [];
+  var getTriDegree = (x, y, ignoredSide) => {
+    let trifecta = [];
 
-    var collectConnected = (wire) => {
-      cluster.push(wire);
+    if (ignoredSide != "top")
+      if (y - 1 >= 0) trifecta.push(grid.cells[x][y - 1]);
 
-      var adjacent = getCross(wire.x, wire.y).filter((material) => {
-        return (
-          material.name == "wire" &&
-          !cluster.some((wire) => wire.x == material.x && wire.y == material.y)
+    if (ignoredSide != "right")
+      if (x + 1 <= grid.CELL_COLUMNS - 1) trifecta.push(grid.cells[x + 1][y]);
+
+    if (ignoredSide != "bottom")
+      if (y + 1 <= grid.CELL_ROWS - 1) trifecta.push(grid.cells[x][y + 1]);
+
+    if (ignoredSide != "left")
+      if (x - 1 >= 0) trifecta.push(grid.cells[x - 1][y]);
+
+    return trifecta;
+  };
+
+  var getPointingDirection = (pointer, target) => {
+    var directions = ["top", "bottom", "right", "left"];
+
+    for (let index = 0; index < directions.length; index++) {
+      let pointing = getDirection(pointer.x, pointer.y, directions[index]);
+      if (pointing == target) return directions[index];
+    }
+  };
+
+  var turnOnWire = (wire, lastWire) => {
+    if (wire.name == "wire") {
+      wire.on = true;
+    }
+
+    if (wire.name == "crossover") {
+      var targetDirection = getPointingDirection(wire, lastWire);
+
+      if (targetDirection == "top" || targetDirection == "bottom")
+        wire.verticalOn = true;
+
+      if (targetDirection == "right" || targetDirection == "left")
+        wire.horizontalOn = true;
+    }
+  };
+
+  var wireIsOn = (wire, lastWire) => {
+    if (wire.name == "wire") {
+      return wire.on;
+    }
+
+    if (wire.name == "crossover") {
+      var targetDirection = getPointingDirection(wire, lastWire);
+
+      if (targetDirection == "top" || targetDirection == "bottom")
+        return wire.verticalOn;
+
+      if (targetDirection == "right" || targetDirection == "left")
+        return wire.horizontalOn;
+    }
+  };
+
+  var turnOnCluster = (onTransistors) => {
+    var collectConnected = (branch, lastBranch) => {
+      if (branch.name == "transistor") {
+        getTriDegree(branch.x, branch.y, branch.rotation)
+          .filter((wire) => wire.name == "wire" || wire.name == "crossover")
+          .forEach((nextWire) => {
+            turnOnWire(nextWire, branch);
+            collectConnected(nextWire, branch);
+          });
+      }
+
+      if (branch.name == "wire") {
+        getCross(branch.x, branch.y)
+          .filter(
+            (nextWire) =>
+              nextWire.name == "wire" || nextWire.name == "crossover"
+          )
+          .forEach((nextWire) => {
+            if (!wireIsOn(nextWire, branch)) {
+              turnOnWire(nextWire, branch);
+              collectConnected(nextWire, branch);
+            }
+          });
+      }
+
+      if (branch.name == "crossover") {
+        var cross = getDirection(
+          branch.x,
+          branch.y,
+          getPointingDirection(lastBranch, branch)
         );
-      });
 
-      adjacent.forEach((wire) => collectConnected(wire));
+        if (cross && (cross.name == "wire" || cross.name == "crossover"))
+          if (!wireIsOn(cross, branch)) {
+            turnOnWire(cross, branch);
+            collectConnected(cross, branch);
+          }
+      }
     };
 
-    collectConnected(startWire);
-
-    return cluster;
+    onTransistors.forEach((transistor) => collectConnected(transistor));
   };
 
-  return { getCross, getTriDegree, getDirection, getWireCluster };
+  return {
+    getPointingDirection,
+    getCross,
+    getDirection,
+    getTriDegree,
+    turnOnCluster,
+  };
 })();

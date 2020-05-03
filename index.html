@@ -8,6 +8,9 @@
     <div id="tools">
       <button class="tool-button" id="wire-tool-button">Wire</button>
       <button class="tool-button" id="transistor-tool-button">
+        Crossover
+      </button>
+      <button class="tool-button" id="transistor-tool-button">
         Transistor
       </button>
     </div>
@@ -27,8 +30,11 @@
 
 <script src="matrix.js" type="module"></script>
 
+<script src="material.js" type="module"></script>
+
 <script src="material/Wire.js" type="module"></script>
 <script src="material/Transistor.js" type="module"></script>
+<script src="material/Crossover.js" type="module"></script>
 
 <script src="toolSelect.js" type="module"></script>
 
@@ -43,6 +49,7 @@
 
   #canvas {
     border: 5px solid black;
+    border-radius: 10px;
     display: block;
   }
 

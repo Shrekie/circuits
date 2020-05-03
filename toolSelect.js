@@ -1,10 +1,11 @@
 import grid from "./grid.js";
 import Wire from "./material/Wire.js";
 import Transistor from "./material/Transistor.js";
+import Crossover from "./material/Crossover.js";
 
 export default (() => {
   var tools = [...document.getElementById("tools").children];
-  var toolList = [Wire, Transistor];
+  var toolList = [Wire, Crossover, Transistor];
   var active = null;
 
   var rotateTransistor = (transistor, x, y) => {
@@ -14,19 +15,22 @@ export default (() => {
     if (transistor.rotation == "left") return new Transistor(x, y, "top");
   };
 
-  var transistorTwiceSelected = (x, y) => {
+  var toolTwiceSelected = (cell, name, constructor, eventType) => {
     return (
-      grid.cells[x][y] &&
-      grid.cells[x][y].name == "transistor" &&
+      cell &&
+      cell.name == name &&
       active &&
-      active.prototype.constructor == Transistor
+      active.prototype.constructor == constructor &&
+      eventType != "mousemove"
     );
   };
 
   var getActive = (x, y, event) => {
     if (event.which == 3 || event.which == 2) return false;
 
-    if (transistorTwiceSelected(x, y) && event.type != "mousemove")
+    if (
+      toolTwiceSelected(grid.cells[x][y], "transistor", Transistor, event.type)
+    )
       return rotateTransistor(grid.cells[x][y], x, y);
 
     if (active) return new active(x, y);

@@ -1,5 +1,5 @@
 import grid from "../grid.js";
-import matrix from "../matrix.js";
+import material from "../material.js";
 
 export default class Wire {
   constructor(x, y) {
@@ -10,29 +10,13 @@ export default class Wire {
     this.y = y;
   }
 
-  clusterTurnedOn() {
-    var crossOnTransistor = matrix
-      .getCross(this.x, this.y)
-      .some(
-        (cell) =>
-          cell.name == "transistor" &&
-          cell.on == true &&
-          matrix.getDirection(cell.x, cell.y, cell.rotation) != this
-      );
-
-    if (crossOnTransistor)
-      matrix.getWireCluster(this).forEach((wire) => {
-        wire.on = true;
-      });
-  }
-
   getColor() {
     if (this.on) return "blue";
     else return "lightblue";
   }
 
   drawCircle() {
-    this.clusterTurnedOn();
+    material.conductCluster(this);
 
     canvas2DContext.fillStyle = this.getColor();
 

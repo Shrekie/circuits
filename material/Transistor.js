@@ -13,15 +13,25 @@ export default class Transistor {
   }
 
   flipOnIntake() {
-    let cellDirection = matrix.getDirection(this.x, this.y, this.rotation);
+    let cellOnIntake = matrix.getDirection(this.x, this.y, this.rotation);
 
-    if (
-      cellDirection &&
-      cellDirection.name == "wire" &&
-      cellDirection.on == true
-    )
+    if (cellOnIntake && cellOnIntake.name == "wire" && cellOnIntake.on == true)
       this.on = false;
-    else this.on = true;
+    else if (cellOnIntake && cellOnIntake.name == "crossover") {
+      let intakeDirection = matrix.getPointingDirection(cellOnIntake, this);
+
+      if (
+        (intakeDirection == "top" || intakeDirection == "bottom") &&
+        cellOnIntake.verticalOn == true
+      )
+        this.on = false;
+      if (
+        (intakeDirection == "right" || intakeDirection == "left") &&
+        cellOnIntake.horizontalOn == true
+      )
+        this.on = false;
+        
+    } else this.on = true;
   }
 
   getColor() {

@@ -26,24 +26,27 @@ export default (() => {
         canvas2DContext.stroke();
 
         // Draw current from all transistors
-        if (cells[x][y].name == "wire") cells[x][y].tick();
+        if (cells[x][y].name == "wire" || cells[x][y].name == "crossover")
+          cells[x][y].tick();
       }
     }
 
     for (let x = 0; x < CELL_COLUMNS; x++) {
       for (let y = 0; y < CELL_ROWS; y++) {
-        // Flip transistors
-        if (cells[x][y].name == "transistor") cells[x][y].tick();
-        
         // Redraw flipped current
-        if (cells[x][y].name == "wire") cells[x][y].tick();
+        if (cells[x][y]) cells[x][y].tick();
       }
     }
 
     for (let x = 0; x < CELL_COLUMNS; x++) {
       for (let y = 0; y < CELL_ROWS; y++) {
-        // Reset wire for next tick
+        // Reset wires for next tick
         if (cells[x][y].name == "wire") cells[x][y].on = false;
+        
+        if (cells[x][y].name == "crossover") {
+          cells[x][y].verticalOn = false;
+          cells[x][y].horizontalOn = false;
+        }
       }
     }
   };

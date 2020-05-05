@@ -74,7 +74,7 @@ export default (() => {
 
       if (pointingAxis.vertical) wire.verticalOn = pointingAxis.vertical;
 
-      if (pointingAxis.horizontal) wire.verticalOn = pointingAxis.horizontal;
+      if (pointingAxis.horizontal) wire.horizontalOn = pointingAxis.horizontal;
     }
   };
 
